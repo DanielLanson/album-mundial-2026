@@ -332,15 +332,14 @@ function buildContent() {
 function exportMissing() {
   const lines = [];
   const date = new Date().toLocaleDateString("es-AR");
-  lines.push(`FIGURITAS FALTANTES — Álbum Panini Mundial 2026`);
-  lines.push(`Generado el ${date}`);
-  lines.push(`Total faltantes: ${980 - totalOwned()} de 980`);
+  lines.push(`Faltantes - Mundial 2026 (${date})`);
+  lines.push(`${980 - totalOwned()} de 980`);
   lines.push("");
 
   // FWC
   const fwcMissing = FWC.map((label, i) => owned[`FWC_${i}`] ? null : label).filter(Boolean);
   if (fwcMissing.length) {
-    lines.push(`── ESPECIALES FWC (${fwcMissing.length} faltan) ──`);
+    lines.push("FWC");
     fwcMissing.forEach(l => lines.push(`  ${l}`));
     lines.push("");
   }
@@ -353,23 +352,22 @@ function exportMissing() {
       const missing = [];
       for (let i = 0; i < 20; i++) {
         if (!owned[`${team.c}_${i}`]) {
-          const label = i === 0 ? "★ Escudo FOIL" : i === 12 ? "📷 Foto grupal" : `Jugador ${i + 1}`;
-          missing.push(label);
+          missing.push(String(i + 1).padStart(2, "0"));
         }
       }
       if (missing.length) {
-        teamLines.push(`  ${team.f} ${team.n} (${missing.length} faltan): ${missing.join(", ")}`);
+        teamLines.push(`  ${team.n}: ${missing.join(", ")}`);
       }
     });
     if (teamLines.length) {
-      lines.push(`── ${group} ──`);
+      lines.push(group);
       teamLines.forEach(l => lines.push(l));
       lines.push("");
     }
   });
 
-  if (lines.length <= 4) {
-    lines.push("¡Álbum completo! No faltan figuritas. 🏆");
+  if (lines.length <= 3) {
+    lines.push("Album completo!");
   }
 
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
