@@ -57,7 +57,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="stats">
     <div class="stat"><b id="sPct">0%</b>completado</div>
     <div class="stat"><b id="sHave">0</b>tengo</div>
-    <div class="stat"><b id="sMiss">981</b>faltan</div>
+    <div class="stat"><b id="sMiss">980</b>faltan</div>
     <div class="stat"><b id="sTeams">0/48</b>equipos</div>
   </div>
 </div>
@@ -86,10 +86,11 @@ const ownedRef = ref(db, "owned");
 const FWC = [
   "00 — Especial Panini","FWC1 — Emblema oficial","FWC2 — Trofeo (1/2)","FWC3 — Trofeo (2/2)",
   "FWC4 — Mascota","FWC5 — Balón oficial","FWC6 — Slogan","FWC7 — Ciudad: México",
-  "FWC8 — Ciudad: EE.UU.","FWC9 — Ciudad: Canadá",
-  "FWC10 — Museo 1934","FWC11 — Museo 1938","FWC12 — Museo 1950",
-  "FWC13 — Museo 1954","FWC14 — Museo 1962","FWC15 — Museo 1966","FWC16 — Museo 1978",
-  "FWC17 — Museo 1986","FWC18 — Museo 1994","FWC19 — Museo 2002","FWC20 — Museo 2022"
+  "FWC8 — Ciudad: EE.UU.",
+  "FWC9 — Italia 1934","FWC10 — Brasil 1950","FWC11 — Suiza 1954",
+  "FWC12 — Chile 1962","FWC13 — Alemania Occ. 1974","FWC14 — México 1986",
+  "FWC15 — EE.UU. 1994","FWC16 — Corea/Japón 2002","FWC17 — Alemania 2006",
+  "FWC18 — Brasil 2014","FWC19 — Qatar 2022"
 ];
 
 const TEAMS = [
@@ -178,11 +179,11 @@ function totalOwned() {
 
 function updateStats() {
   const tot = totalOwned();
-  const pct = Math.round(tot/981*100);
+  const pct = Math.round(tot/980*100);
   document.getElementById("progFill").style.width = pct+"%";
   document.getElementById("sPct").textContent = pct+"%";
   document.getElementById("sHave").textContent = tot;
-  document.getElementById("sMiss").textContent = 981-tot;
+  document.getElementById("sMiss").textContent = 980-tot;
   document.getElementById("sTeams").textContent = TEAMS.filter(t=>teamProgress(t.c)===20).length+"/48";
 }
 
