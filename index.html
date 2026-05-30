@@ -329,6 +329,10 @@ function buildContent() {
   });
 }
 
+function ascii(str) {
+  return str.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
 function exportMissing() {
   const lines = [];
   const date = new Date().toLocaleDateString("es-AR");
@@ -340,7 +344,7 @@ function exportMissing() {
   const fwcMissing = FWC.map((label, i) => owned[`FWC_${i}`] ? null : label).filter(Boolean);
   if (fwcMissing.length) {
     lines.push("FWC");
-    fwcMissing.forEach(l => lines.push(`  ${l}`));
+    fwcMissing.forEach(l => lines.push(`  ${ascii(l)}`));
     lines.push("");
   }
 
@@ -356,11 +360,11 @@ function exportMissing() {
         }
       }
       if (missing.length) {
-        teamLines.push(`  ${team.n}: ${missing.join(", ")}`);
+        teamLines.push(`  ${ascii(team.n)}: ${missing.join(", ")}`);
       }
     });
     if (teamLines.length) {
-      lines.push(group);
+      lines.push(ascii(group));
       teamLines.forEach(l => lines.push(l));
       lines.push("");
     }
