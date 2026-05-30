@@ -1,233 +1,309 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-	<meta charset="utf-8" />
-	<!--<meta name="Generator" content="Drupal 8 (https://www.drupal.org)" /> -->
-	<meta name="MobileOptimized" content="width" />
-	<meta name="HandheldFriendly" content="true" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="shortcut icon" href="img/favicon.png" type="image/png" />
-
-	<title>GAIA</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;1,400&family=Source+Sans+Pro:wght@400;700&display=swap">
-	<link rel="stylesheet" href="css/styles.css">
-	<link rel="stylesheet" href="css/modern.css">
-	<script src="js/libraries/jquery-2.2.3.min.js"></script>
-	<script src="js/libraries/svg4everybody.min.js"></script>
-	<script src="js/libraries/jquery.cycle2.min.js"></script>
-	<script src="js/libraries/scrollreveal.min.js"></script>
-	<script src="js/constant.js"></script>
-	
-	<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  			ga('create', 'UA-93740354-1', 'auto');
-  			ga('send', 'pageview');
-	</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Panini Mundial 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a18;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid #e0ded8;padding:12px 16px;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:15px;font-weight:600;margin-bottom:8px}
+.prog-bar{height:8px;border-radius:4px;background:#e0ded8;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:#1D9E75;transition:width .3s}
+.stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.stat{background:#f5f5f0;border-radius:8px;padding:6px 12px;font-size:12px;color:#666;flex:1;min-width:70px;text-align:center}
+.stat b{display:block;font-size:18px;font-weight:600;color:#1a1a18}
+.filters{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;background:#fff;border-bottom:1px solid #e0ded8;overflow-x:auto}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid #ccc;background:#fff;color:#555;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.fbtn.active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:600}
+.content{padding:12px 16px;max-width:600px;margin:0 auto}
+.group-label{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:16px 0 6px}
+.team-card{background:#fff;border:1px solid #e0ded8;border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.team-card.done{border-color:#5DCAA5}
+.team-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.team-left{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
+.team-right{display:flex;align-items:center;gap:8px}
+.prog-text{font-size:12px;color:#888}
+.prog-text.full{color:#0F6E56;font-weight:600}
+.chevron{font-size:10px;color:#aaa;transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.team-body{padding:0 14px 14px;display:none}
+.team-body.open{display:block}
+.toggle-all{font-size:12px;color:#0F6E56;background:none;border:none;cursor:pointer;padding:4px 0 8px;display:block}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.sticker{border-radius:6px;border:1px solid #e0ded8;background:#f9f9f7;font-size:11px;color:#888;cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-weight:500;-webkit-tap-highlight-color:transparent;transition:all .15s;user-select:none}
+.sticker.on{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.sticker.foil{border-color:#FAC775;background:#FFFBF0;color:#BA7517}
+.sticker.foil.on{background:#EF9F27;border-color:#EF9F27;color:#fff}
+.sticker.photo{border-color:#B5D4F4;background:#EEF6FE;color:#185FA5}
+.sticker.photo.on{background:#378ADD;border-color:#378ADD;color:#fff}
+.legend{display:flex;gap:12px;margin-top:8px;font-size:11px;color:#aaa}
+.fwc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.fwc-btn{padding:7px 10px;border-radius:8px;border:1px solid #e0ded8;background:#f9f9f7;color:#888;font-size:12px;cursor:pointer;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.fwc-btn.on{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:500}
+.badge-done{display:inline-block;font-size:10px;color:#0F6E56;margin-left:4px}
+</style>
 </head>
-
 <body>
-<header id="header">
-	<div class="column">
-		<h1 data-section="#slideshow"><svg aria-label="GAIA"><use xlink:href="files/constant.svg#logo-full"/></svg></h1>
-		<nav>
-			<ul>
-				<li><button type="button" data-section="#quienes-somos">Nosotros</button></li>
-				<li><button type="button" data-section="#sistemas">Transformación digital</button></li>
-				<li><button type="button" data-section="#estudios">Sistemas de Información</button></li>
-				<li><button type="button" data-section="#indicadores">IA Aplicada</button></li>
-				<li><button type="button" data-section="#formacion">Formación</button></li>
-				<li><button type="button" data-section="#contactenos">Contacto</button></li>
-			</ul>
-		</nav>
-		<button type="button" class="nav-responsive"><span>Toggle navigation</span></button>
-	</div>
-	<svg aria-hidden="true" preserveAspectRatio="none" class="opening"><use xlink:href="files/constant.svg#opening"/></svg>
-</header>
-<main>
-	
-<!-- - - - - - - - - - Slideshow -->
 
+<div class="topbar">
+  <h1>⚽ Álbum Panini — Mundial 2026</h1>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="stats">
+    <div class="stat"><b id="sPct">0%</b>completado</div>
+    <div class="stat"><b id="sHave">0</b>tengo</div>
+    <div class="stat"><b id="sMiss">980</b>faltan</div>
+    <div class="stat"><b id="sTeams">0/48</b>equipos</div>
+  </div>
+</div>
 
-	<section id="slideshow" data-style="background-image: url('files/quienes-somos/contactanos_0.jpg');">
-		<div class="column" data-sr="enter left move 48px">
-			<div class="col-xl-8">
-				<p>Hacemos consultoría en gestión ambiental y transformación digital.<br>Acompañamos a la producción de conocimiento y resolución de problemas.</p>
-				<button type="button" class="button white" data-section="#contactenos">Contactanos</button>
-			</div>
-		</div>
-		<svg aria-hidden="true" preserveAspectRatio="none" class="opening"><use xlink:href="files/constant.svg#opening"/></svg>
-		<svg aria-hidden="true" preserveAspectRatio="none" class="ending"><use xlink:href="files/constant.svg#ending"/></svg>
-	</section>
+<div class="filters" id="filters"></div>
+<div class="content" id="content"></div>
 
+<script>
+const FWC = [
+  "00 — Especial Panini","FWC1 — Emblema oficial","FWC2 — Mascota","FWC3 — Trofeo",
+  "FWC4 — Balón oficial","FWC5 — Slogan","FWC6 — Ciudad: México","FWC7 — Ciudad: EE.UU.",
+  "FWC8 — Ciudad: Canadá","FWC9 — Museo 1934","FWC10 — Museo 1938","FWC11 — Museo 1950",
+  "FWC12 — Museo 1954","FWC13 — Museo 1962","FWC14 — Museo 1966","FWC15 — Museo 1978",
+  "FWC16 — Museo 1986","FWC17 — Museo 1994","FWC18 — Museo 2002","FWC19 — Museo 2022"
+];
 
-<!-- - - - - - - - - - Quienes somos -->
+const TEAMS = [
+  {c:"MEX",n:"México",g:"Grupo A",f:"🇲🇽"},
+  {c:"RSA",n:"Sudáfrica",g:"Grupo A",f:"🇿🇦"},
+  {c:"KOR",n:"Corea del Sur",g:"Grupo A",f:"🇰🇷"},
+  {c:"CZE",n:"Rep. Checa",g:"Grupo A",f:"🇨🇿"},
+  {c:"CAN",n:"Canadá",g:"Grupo B",f:"🇨🇦"},
+  {c:"BIH",n:"Bosnia y Herzegovina",g:"Grupo B",f:"🇧🇦"},
+  {c:"QAT",n:"Catar",g:"Grupo B",f:"🇶🇦"},
+  {c:"SUI",n:"Suiza",g:"Grupo B",f:"🇨🇭"},
+  {c:"BRA",n:"Brasil",g:"Grupo C",f:"🇧🇷"},
+  {c:"MAR",n:"Marruecos",g:"Grupo C",f:"🇲🇦"},
+  {c:"HAI",n:"Haití",g:"Grupo C",f:"🇭🇹"},
+  {c:"SCO",n:"Escocia",g:"Grupo C",f:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"},
+  {c:"USA",n:"Estados Unidos",g:"Grupo D",f:"🇺🇸"},
+  {c:"PAR",n:"Paraguay",g:"Grupo D",f:"🇵🇾"},
+  {c:"AUS",n:"Australia",g:"Grupo D",f:"🇦🇺"},
+  {c:"TUR",n:"Turquía",g:"Grupo D",f:"🇹🇷"},
+  {c:"GER",n:"Alemania",g:"Grupo E",f:"🇩🇪"},
+  {c:"CUW",n:"Curazao",g:"Grupo E",f:"🇨🇼"},
+  {c:"CIV",n:"Costa de Marfil",g:"Grupo E",f:"🇨🇮"},
+  {c:"ECU",n:"Ecuador",g:"Grupo E",f:"🇪🇨"},
+  {c:"NED",n:"Países Bajos",g:"Grupo F",f:"🇳🇱"},
+  {c:"JPN",n:"Japón",g:"Grupo F",f:"🇯🇵"},
+  {c:"SWE",n:"Suecia",g:"Grupo F",f:"🇸🇪"},
+  {c:"TUN",n:"Túnez",g:"Grupo F",f:"🇹🇳"},
+  {c:"BEL",n:"Bélgica",g:"Grupo G",f:"🇧🇪"},
+  {c:"EGY",n:"Egipto",g:"Grupo G",f:"🇪🇬"},
+  {c:"IRN",n:"Irán",g:"Grupo G",f:"🇮🇷"},
+  {c:"NZL",n:"Nueva Zelanda",g:"Grupo G",f:"🇳🇿"},
+  {c:"ESP",n:"España",g:"Grupo H",f:"🇪🇸"},
+  {c:"CPV",n:"Cabo Verde",g:"Grupo H",f:"🇨🇻"},
+  {c:"SAU",n:"Arabia Saudita",g:"Grupo H",f:"🇸🇦"},
+  {c:"URU",n:"Uruguay",g:"Grupo H",f:"🇺🇾"},
+  {c:"FRA",n:"Francia",g:"Grupo I",f:"🇫🇷"},
+  {c:"SEN",n:"Senegal",g:"Grupo I",f:"🇸🇳"},
+  {c:"IRQ",n:"Irak",g:"Grupo I",f:"🇮🇶"},
+  {c:"NOR",n:"Noruega",g:"Grupo I",f:"🇳🇴"},
+  {c:"ARG",n:"Argentina",g:"Grupo J",f:"🇦🇷"},
+  {c:"ALG",n:"Argelia",g:"Grupo J",f:"🇩🇿"},
+  {c:"AUT",n:"Austria",g:"Grupo J",f:"🇦🇹"},
+  {c:"JOR",n:"Jordania",g:"Grupo J",f:"🇯🇴"},
+  {c:"POR",n:"Portugal",g:"Grupo K",f:"🇵🇹"},
+  {c:"COD",n:"RD Congo",g:"Grupo K",f:"🇨🇩"},
+  {c:"UZB",n:"Uzbekistán",g:"Grupo K",f:"🇺🇿"},
+  {c:"COL",n:"Colombia",g:"Grupo K",f:"🇨🇴"},
+  {c:"ENG",n:"Inglaterra",g:"Grupo L",f:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {c:"CRO",n:"Croacia",g:"Grupo L",f:"🇭🇷"},
+  {c:"GHA",n:"Ghana",g:"Grupo L",f:"🇬🇭"},
+  {c:"PAN",n:"Panamá",g:"Grupo L",f:"🇵🇦"},
+];
 
-	<article id="quienes-somos">
-		<h2><svg aria-hidden="true"><use xlink:href="files/constant.svg#users"/></svg>Nosotros</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="files/constant.svg#detail"/></svg>
-		<div class="column" data-sr="enter top move 96px vFactor 0.2">
-			<div class="col-l-10">
-				<p>Gaia Ingeniería es una consultora especializada en sistemas de información ambiental y territorial, con diez años de trayectoria trabajando junto a organismos públicos y organizaciones privadas.</p>
-				<p>Nos especializamos en traducir la complejidad del entorno ambiental y territorial en información útil, accesible y accionable. Cada proyecto es una oportunidad de construir soluciones a medida: escalables, adaptadas al contexto y orientadas a las necesidades reales de quienes las van a usar.</p>
-				<p>Nos mueve un compromiso genuino con el ambiente y con las organizaciones que trabajan para gestionarlo mejor. Por eso combinamos rigor técnico con cercanía, e innovación con sensibilidad hacia cada realidad institucional y territorial.</p>
-			</div>
-		</div>
+const STORAGE_KEY = "mundial2026_owned";
+let owned = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+let currentFilter = "all";
+let openTeam = null;
 
-	</article>
-	
-	
-<!-- - - - -- - Sistema Audiovisuales -->
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(owned)); }
 
-	<article id="sistemas">
-		<h2><svg aria-hidden="true"><use xlink:href="files/constant.svg#gear"/></svg>Transformación Digital</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="/files/constant.svg#detail"/></svg>
-		<div class="paragraphs-container">
-			<div class="column">
-				<div class="paragraphs" data-sr="enter right move 144px">
-					<p>Acompañamos a organizaciones públicas y privadas en la digitalización de sus procesos de gestión ambiental y territorial, mediante el desarrollo de plataformas, herramientas y bases de datos a medida. Desde la integración de fuentes de datos existentes hasta el despliegue de sistemas de consulta, visualización y monitoreo, cada solución se diseña para mejorar la capacidad operativa y la toma de decisiones.</p>
-				</div>
-			</div>
-		</div>
-	</article>
-	
-	
-<!-- - - - - - Estudios -->
+function toggle(key) {
+  owned[key] = !owned[key];
+  if (!owned[key]) delete owned[key];
+  save();
+  updateStats();
+  updateTeamUI(key.split("_")[0]);
+}
 
-	<article id="estudios">
-		<h2><svg aria-hidden="true"><use xlink:href="files/constant.svg#eye"/></svg>Estudios y análisis</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="files/constant.svg#detail"/></svg>
-		<div class="column" data-sr="enter down move 96px">
-			<div class="columns">
-				<div class="col-l-10">
-					<p>Desarrollamos sistemas a medida para la captura, procesamiento y gestión de información ambiental y territorial, adaptados a los flujos de trabajo y necesidades operativas de cada organización. Cada solución integra las fuentes de datos relevantes y estructura la información para que esté disponible en el momento y formato que el equipo necesita.</p>
-				</div>
-			</div>
-		</div>
-		<div class="column" data-sr="enter top move 96px vFactor 0.2">
-			<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="0" width="0">
-				<clippath id="mask">
-				<path d="M0,44.2c0-1.4,1-3.1,2.1-3.8L66.9,0.5c1.2-0.7,3.1-0.7,4.3,0l64.7,39.9c1.2,0.7,2.1,2.4,2.1,3.8v67.5c0,1.4-1,3.1-2.1,3.8l-64.7,39.9c-1.2,0.7-3.1,0.7-4.3,0L2.1,115.6C1,114.9,0,113.1,0,111.8L0,44.2z"/></clippath>
-			</svg>
-			<ul class="columns">
-				<li class="col-s-4" data-image="files/quienes-somos/ingenieria-consultoria.jpg">Evaluación de Impacto Ambiental (EIA)</li>
-				<li class="col-s-4" data-image="files/quienes-somos/sistemas-informacion.jpg">Diagnóstico y línea de base ambiental</li>
-				<li class="col-s-4" data-image="files/quienes-somos/integracion-tecnologias.jpg">Análisis de riesgo y vulnerabilidad territorial</li>
-				<li class="col-s-4" data-image="files/quienes-somos/investigacion-interdisciplinaria.jpg">Ordenamiento y planificación territorial</li>
-				<li class="col-s-4" data-image="files/quienes-somos/formacion-entretenimiento.jpg">Monitoreo y seguimiento ambiental</li>
-			</ul>
-		</div>
-	</article>
+function teamProgress(code) {
+  return Array.from({length:20},(_,i)=>owned[`${code}_${i}`]?1:0).reduce((a,b)=>a+b,0);
+}
 
+function fwcProgress() {
+  return FWC.filter((_,i)=>owned[`FWC_${i}`]).length;
+}
 
-<!-- - - - - - Indicadores -->
+function totalOwned() {
+  let n = fwcProgress();
+  TEAMS.forEach(t => { for(let i=0;i<20;i++) if(owned[`${t.c}_${i}`]) n++; });
+  return n;
+}
 
-	<article id="indicadores">
-		<h2>Sistemas de indicadores y estándares internacionales</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="files/constant.svg#detail"/></svg>
-		<div class="column" data-sr="enter top move 96px vFactor 0.2">
-			<div class="col-l-10">
-				<p>Incorporamos capacidades de inteligencia artificial y modelos de lenguaje para potenciar el análisis, clasificación e interpretación de datos ambientales y territoriales. Aplicamos estas tecnologías para automatizar procesos complejos, detectar patrones y generar conocimiento a partir de grandes volúmenes de información.</p>
-			</div>
-		</div>
-		<div class="ingenieria" data-sr="scale up 20% vFactor 0.2">
-			<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="0" width="0">
-				<clippath id="mask-big"><path d="M0,69.2c0-1.1,0.8-2.5,1.7-3L108.3,0.4c0.9-0.6,2.5-0.6,3.4,0l106.6,65.7c0.9,0.6,1.7,1.9,1.7,3v111.7c0,1.1-0.8,2.5-1.7,3l-106.6,65.7c-0.9,0.6-2.5,0.6-3.4,0L1.7,183.9c-0.9-0.6-1.7-1.9-1.7-3L0,69.2z"/></clippath>
-			</svg>
-			<ul class="herramientas">
-				<li data-herramientas="files/sistemas-informacion/cartografia_0.jpg"><span>______</span></li>
-				<li data-herramientas="files/sistemas-informacion/imagenes.jpg"><span>______</span></li>
-				<li data-herramientas="files/sistemas-informacion/documentos.jpg"><span>______</span></li>
-				<li data-herramientas="files/sistemas-informacion/sensores-remotos.jpg"><span>______</span></li>
-				<li data-herramientas="files/sistemas-informacion/elementos-especificos.jpg"><span>______</span></li>
-			</ul>
-		</div>
-	</article>
+function updateStats() {
+  const tot = totalOwned();
+  const pct = Math.round(tot/980*100);
+  document.getElementById("progFill").style.width = pct+"%";
+  document.getElementById("sPct").textContent = pct+"%";
+  document.getElementById("sHave").textContent = tot;
+  document.getElementById("sMiss").textContent = 980-tot;
+  document.getElementById("sTeams").textContent = TEAMS.filter(t=>teamProgress(t.c)===20).length+"/48";
+}
 
+function updateTeamUI(code) {
+  if (code === "FWC") {
+    const fp = fwcProgress();
+    const card = document.querySelector(`[data-team="FWC"]`);
+    if (!card) return;
+    card.querySelector(".prog-text").textContent = fp+"/"+FWC.length;
+    card.querySelector(".prog-text").className = "prog-text"+(fp===FWC.length?" full":"");
+    card.className = "team-card"+(fp===FWC.length?" done":"");
+    if (openTeam === "FWC") {
+      card.querySelectorAll(".fwc-btn").forEach((btn,i) => {
+        btn.className = "fwc-btn"+(owned[`FWC_${i}`]?" on":"");
+        btn.textContent = (owned[`FWC_${i}`]?"✓ ":"")+FWC[i];
+      });
+      card.querySelector(".toggle-all").textContent = fp===FWC.length?"Desmarcar todas":"Marcar todas";
+    }
+  } else {
+    const prog = teamProgress(code);
+    const card = document.querySelector(`[data-team="${code}"]`);
+    if (!card) return;
+    card.querySelector(".prog-text").textContent = prog+"/20";
+    card.querySelector(".prog-text").className = "prog-text"+(prog===20?" full":"");
+    card.className = "team-card"+(prog===20?" done":"");
+    if (prog===20) card.querySelector(".team-left").innerHTML = card.querySelector(".team-left").innerHTML.replace(/<span class="badge-done">.*?<\/span>/,"") + '<span class="badge-done">✓</span>';
+    else { const b=card.querySelector(".badge-done"); if(b) b.remove(); }
+    if (openTeam === code) {
+      card.querySelectorAll(".sticker").forEach((btn,i) => {
+        const on = !!owned[`${code}_${i}`];
+        let cls = "sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
+        btn.className = cls;
+        btn.textContent = i===0?(on?"★":"★"):i===12?(on?"📷":"📷"):(i+1);
+      });
+      card.querySelector(".toggle-all").textContent = prog===20?"Desmarcar todas":"Marcar todas";
+    }
+  }
+}
 
-<!-- - - - - - Formación -->
+function buildFilters() {
+  const groups = ["all","complete","incomplete",...new Set(TEAMS.map(t=>t.g))];
+  const labels = {all:"Todos",complete:"Completos",incomplete:"Incompletos"};
+  const el = document.getElementById("filters");
+  el.innerHTML = groups.map(g=>`<button class="fbtn${currentFilter===g?" active":""}" data-f="${g}">${labels[g]||g}</button>`).join("");
+  el.querySelectorAll(".fbtn").forEach(btn => btn.addEventListener("click", ()=>{
+    currentFilter = btn.dataset.f;
+    buildFilters();
+    buildContent();
+  }));
+}
 
-	<article id="formacion">
-		<h2>Formación y transferencia de capacidades</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="files/constant.svg#detail"/></svg>
-		<div class="column" data-sr="enter top move 96px vFactor 0.2">
-			<div class="col-l-10">
-				<p>Fortalecemos las capacidades de las organizaciones para gestionar su propia información ambiental y territorial. Los programas formativos se diseñan a medida, ajustados al nivel técnico y las necesidades operativas de cada equipo.</p>
-			</div>
-		</div>
-		<div class="images">
-			<svg aria-hidden="true" preserveAspectRatio="none" class="opening"><use xlink:href="/files/constant.svg#opening"/></svg>
-			<div class="column" data-sr="scale down 20%">
-				<ul class="columns">
-					<li data-sistema="background-image: url('files/sistemas-informacion/desarrollo-administracion.jpg');" class="col-s-6 col-m-7">Automatización de procesos</li>
-					<li data-sistema="background-image: url('files/sistemas-informacion/desarrollo-herramientas.jpg');" class="col-s-6 col-m-7">Soporte a la decisión</li>
-					<li data-sistema="background-image: url('files/sistemas-informacion/metodologias-investigacion.jpg');" class="col-s-6 col-m-7">Inteligencia artificial aplicada</li>
-				</ul>
-			</div>
-		</div>
-	</article>
+function buildContent() {
+  const el = document.getElementById("content");
+  let html = "";
 
+  const showSpecial = currentFilter==="all"||currentFilter==="incomplete";
+  const fwcProg = fwcProgress();
+  if (showSpecial || currentFilter==="all") {
+    html += `<div class="group-label">Figuritas especiales</div>`;
+    const done = fwcProg===FWC.length;
+    html += `<div class="team-card${done?" done":""}" data-team="FWC">
+      <div class="team-header" data-open="FWC">
+        <div class="team-left">✨ Especiales FWC + #00</div>
+        <div class="team-right">
+          <span class="prog-text${done?" full":""}">${fwcProg}/${FWC.length}</span>
+          <span class="chevron${openTeam==="FWC"?" open":""}">▼</span>
+        </div>
+      </div>
+      <div class="team-body${openTeam==="FWC"?" open":""}">
+        <button class="toggle-all" data-toggleall="FWC">${done?"Desmarcar todas":"Marcar todas"}</button>
+        <div class="fwc-grid">
+          ${FWC.map((label,i)=>`<button class="fwc-btn${owned[`FWC_${i}`]?" on":""}" data-key="FWC_${i}">${owned[`FWC_${i}`]?"✓ ":""}${label}</button>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  }
 
-<!-- - - - - - Contacto -->
+  const groups = [...new Set(TEAMS.map(t=>t.g))];
+  groups.forEach(group => {
+    let teams = TEAMS.filter(t=>t.g===group);
+    if (currentFilter==="complete") teams=teams.filter(t=>teamProgress(t.c)===20);
+    else if (currentFilter==="incomplete") teams=teams.filter(t=>teamProgress(t.c)<20);
+    else if (currentFilter!=="all") teams=teams.filter(t=>t.g===currentFilter);
+    if (!teams.length) return;
+    html += `<div class="group-label">${group}</div>`;
+    teams.forEach(team => {
+      const prog = teamProgress(team.c);
+      const done = prog===20;
+      const isOpen = openTeam===team.c;
+      html += `<div class="team-card${done?" done":""}" data-team="${team.c}">
+        <div class="team-header" data-open="${team.c}">
+          <div class="team-left">${team.f} ${team.n}${done?'<span class="badge-done">✓</span>':""}</div>
+          <div class="team-right">
+            <span class="prog-text${done?" full":""}">${prog}/20</span>
+            <span class="chevron${isOpen?" open":""}">▼</span>
+          </div>
+        </div>
+        <div class="team-body${isOpen?" open":""}">
+          <button class="toggle-all" data-toggleall="${team.c}">${prog===20?"Desmarcar todas":"Marcar todas"}</button>
+          <div class="grid">
+            ${Array.from({length:20},(_,i)=>{
+              const on=!!owned[`${team.c}_${i}`];
+              const cls="sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
+              const lbl=i===0?"★":i===12?"📷":(i+1);
+              return `<button class="${cls}" data-key="${team.c}_${i}" title="${i===0?"Escudo FOIL":i===12?"Foto grupal":"Jugador "+(i+1)}">${lbl}</button>`;
+            }).join("")}
+          </div>
+          <div class="legend"><span>★ escudo</span><span>📷 foto</span><span>2–20 jugadores</span></div>
+        </div>
+      </div>`;
+    });
+  });
 
-	<section id="contactenos">
-		<h2><svg aria-hidden="true"><use xlink:href="files/constant.svg#location"/></svg>Contacto</h2>
-		<svg aria-hidden="true" class="end"><use xlink:href="files/constant.svg#detail"/></svg>
-		<div class="column">
-			<div class="alert success hide">
-				<p>Gracias, su mensaje fue enviado con éxito.<br> En breve nos pondremos en contacto.</p>
-				<button type="button" class="close"><svg aria-label="Cerrar"><use xlink:href="files/constant.svg#cross"/></svg></button>
-			</div>
-			<div class="alert error hide">
-				<p>Su mensaje no pudo ser enviado.<br> Por favor intentelo nuevamente más tarde.</p>
-				<button type="button" class="close"><svg aria-label="Cerrar"><use xlink:href="files/constant.svg#cross"/></svg></button>
-			</div>
-			<div class="columns">
-				<div class="col-m-7" data-sr="enter left move 96px">
-					<form action="/contactenos.php" method="post" name="contactenos">
-						<div><input type="text" name="nombre-apellido" placeholder="Nombre y Apellido" required></div>
-						<div><input type="text" name="telefono" placeholder="Teléfono / Celular" required></div>
-						<div><input type="email" name="email" placeholder="Email" required></div>
-						<div><textarea name="mensaje" placeholder="Mensaje" required></textarea></div>
-						<div class="actions"><button class="button">Enviar mensaje</button></div>
-					</form>
-				</div>
-				<div class="col-m-5 col-l-4 col-l-push-1" data-sr="enter right move 96px">
-					<p>Sientase libre de contactarse con nosotros para plantearnos sus consultas. Puede encontrarnos en:</p><h3>Teléfono</h3>
-					<p><a href="tel:+54 11 4854 7798">+54 11 4854 7798</a></p><h3>Email</h3>
-					<p><a href="mailto:info@gaiaingenieria.com.ar">info@gaiaingenieria.com.ar</a></p>
-					<ul>
-						<li><a href="http://example.com" target="_blank" class="facebook"><svg aria-label="Facebook"><use xlink:href="files/constant.svg#iso-facebook"/></svg></a></li>
-						<li><a href="http://example.com" target="_blank" class="vimeo"><svg aria-label="Vimeo"><use xlink:href="files/constant.svg#iso-vimeo"/></svg></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</section>
-</main>
+  el.innerHTML = html;
 
+  el.querySelectorAll("[data-key]").forEach(btn => {
+    btn.addEventListener("click", ()=>{ toggle(btn.dataset.key); });
+  });
 
-<footer id="footer" data-sr="enter down move 48px">
-	<div class="column">
-		<svg aria-label="GAIA" class="logo" data-section="#slideshow"><use xlink:href="files/constant.svg#logo"/></svg>
-		<ul>
-			<li><button type="button" data-section="#slideshow">Inicio</button></li>
-			<li><button type="button" data-section="#quienes-somos">Nosotros</button></li>
-			<li><button type="button" data-section="#sistemas">Sistemas</button></li>
-			<li><button type="button" data-section="#estudios">Estudios</button></li>
-			<li><button type="button" data-section="#indicadores">Indicadores</button></li>
-			<li><button type="button" data-section="#formacion">Formación</button></li>
-			<li><button type="button" data-section="#contactenos">Contacto</button></li>
-		</ul>
-	</div>
-	<svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 92 14">
-		<polygon points="91.5,0 46,12 0.5,0 0,1.9 46,14 92,1.9"/>
-	</svg>
-</footer>
-	
+  el.querySelectorAll("[data-open]").forEach(hdr => {
+    hdr.addEventListener("click", ()=>{
+      const code = hdr.dataset.open;
+      openTeam = openTeam===code ? null : code;
+      buildContent();
+    });
+  });
+
+  el.querySelectorAll("[data-toggleall]").forEach(btn => {
+    btn.addEventListener("click", e=>{
+      e.stopPropagation();
+      const code = btn.dataset.toggleall;
+      if (code==="FWC") {
+        const all = FWC.every((_,i)=>owned[`FWC_${i}`]);
+        FWC.forEach((_,i)=>{ owned[`FWC_${i}`]=!all; if(!owned[`FWC_${i}`]) delete owned[`FWC_${i}`]; });
+      } else {
+        const all = teamProgress(code)===20;
+        for(let i=0;i<20;i++){ owned[`${code}_${i}`]=!all; if(!owned[`${code}_${i}`]) delete owned[`${code}_${i}`]; }
+      }
+      save(); updateStats(); buildContent();
+    });
+  });
+}
+
+buildFilters();
+buildContent();
+updateStats();
+</script>
 </body>
 </html>
