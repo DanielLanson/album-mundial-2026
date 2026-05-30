@@ -47,6 +47,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ccc;margin-left:6px;vertical-align:middle;transition:background .3s}
 .sync-dot.ok{background:#1D9E75}
 .sync-dot.err{background:#e05252}
+.export-btn{display:block;width:100%;margin-top:10px;padding:7px 0;border-radius:8px;border:1px solid #1D9E75;background:#fff;color:#0F6E56;font-size:15px;font-weight:600;cursor:pointer;text-align:center;transition:background .15s}
+.export-btn:active{background:#E1F5EE}
 </style>
 </head>
 <body>
@@ -60,6 +62,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <div class="stat"><b id="sMiss">980</b>faltan</div>
     <div class="stat"><b id="sTeams">0/48</b>equipos</div>
   </div>
+  <button class="export-btn" id="exportBtn">📋 Exportar figuritas faltantes</button>
 </div>
 
 <div class="filters" id="filters"></div>
@@ -325,6 +328,60 @@ function buildContent() {
     });
   });
 }
+
+function exportMissing() {
+  const lines = [];
+  const date = new Date().toLocaleDateString("es-AR");
+  lines.push(`FIGURITAS FALTANTES — Álbum Panini Mundial 2026`);
+  lines.push(`Generado el ${date}`);
+  lines.push(`Total faltantes: ${980 - totalOwned()} de 980`);
+  lines.push("");
+
+  // FWC
+  const fwcMissing = FWC.map((label, i) => owned[`FWC_${i}`] ? null : label).filter(Boolean);
+  if (fwcMissing.length) {
+    lines.push(`── ESPECIALES FWC (${fwcMissing.length} faltan) ──`);
+    fwcMissing.forEach(l => lines.push(`  ${l}`));
+    lines.push("");
+  }
+
+  // Equipos por grupo
+  const groups = [...new Set(TEAMS.map(t => t.g))];
+  groups.forEach(group => {
+    const teamLines = [];
+    TEAMS.filter(t => t.g === group).forEach(team => {
+      const missing = [];
+      for (let i = 0; i < 20; i++) {
+        if (!owned[`${team.c}_${i}`]) {
+          const label = i === 0 ? "★ Escudo FOIL" : i === 12 ? "📷 Foto grupal" : `Jugador ${i + 1}`;
+          missing.push(label);
+        }
+      }
+      if (missing.length) {
+        teamLines.push(`  ${team.f} ${team.n} (${missing.length} faltan): ${missing.join(", ")}`);
+      }
+    });
+    if (teamLines.length) {
+      lines.push(`── ${group} ──`);
+      teamLines.forEach(l => lines.push(l));
+      lines.push("");
+    }
+  });
+
+  if (lines.length <= 4) {
+    lines.push("¡Álbum completo! No faltan figuritas. 🏆");
+  }
+
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `faltantes-mundial2026-${date.replace(/\//g,"-")}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("exportBtn").addEventListener("click", exportMissing);
 
 // Escuchar cambios en tiempo real desde Firebase
 onValue(ownedRef, (snapshot) => {
