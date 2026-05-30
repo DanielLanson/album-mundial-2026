@@ -44,12 +44,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fwc-btn{padding:7px 10px;border-radius:8px;border:1px solid #e0ded8;background:#f9f9f7;color:#888;font-size:12px;cursor:pointer;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .fwc-btn.on{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:500}
 .badge-done{display:inline-block;font-size:10px;color:#0F6E56;margin-left:4px}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ccc;margin-left:6px;vertical-align:middle;transition:background .3s}
+.sync-dot.ok{background:#1D9E75}
+.sync-dot.err{background:#e05252}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <h1>⚽ Álbum Panini — Mundial 2026</h1>
+  <h1>⚽ Álbum Panini — Mundial 2026 <span class="sync-dot" id="syncDot" title="Estado de sincronización"></span></h1>
   <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   <div class="stats">
     <div class="stat"><b id="sPct">0%</b>completado</div>
@@ -62,7 +65,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="filters" id="filters"></div>
 <div class="content" id="content"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcpEh5_0My9IBdfHSZkQ3WaxQVAZ3mmmk",
+  authDomain: "album-mundial-2026-d9bbf.firebaseapp.com",
+  databaseURL: "https://album-mundial-2026-d9bbf-default-rtdb.firebaseio.com",
+  projectId: "album-mundial-2026-d9bbf",
+  storageBucket: "album-mundial-2026-d9bbf.firebasestorage.app",
+  messagingSenderId: "180717490806",
+  appId: "1:180717490806:web:27cb77ce0308af53d64557"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const ownedRef = ref(db, "owned");
+
 const FWC = [
   "00 — Especial Panini","FWC1 — Emblema oficial","FWC2 — Mascota","FWC3 — Trofeo",
   "FWC4 — Balón oficial","FWC5 — Slogan","FWC6 — Ciudad: México","FWC7 — Ciudad: EE.UU.",
@@ -122,19 +142,23 @@ const TEAMS = [
   {c:"PAN",n:"Panamá",g:"Grupo L",f:"🇵🇦"},
 ];
 
-const STORAGE_KEY = "mundial2026_owned";
-let owned = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+let owned = {};
 let currentFilter = "all";
 let openTeam = null;
 
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(owned)); }
+function save() {
+  set(ownedRef, owned).catch(() => {
+    document.getElementById("syncDot").className = "sync-dot err";
+  });
+}
 
 function toggle(key) {
   owned[key] = !owned[key];
   if (!owned[key]) delete owned[key];
-  save();
+  // optimistic local update
   updateStats();
   updateTeamUI(key.split("_")[0]);
+  save();
 }
 
 function teamProgress(code) {
@@ -188,9 +212,8 @@ function updateTeamUI(code) {
     if (openTeam === code) {
       card.querySelectorAll(".sticker").forEach((btn,i) => {
         const on = !!owned[`${code}_${i}`];
-        let cls = "sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
-        btn.className = cls;
-        btn.textContent = i===0?(on?"★":"★"):i===12?(on?"📷":"📷"):(i+1);
+        btn.className = "sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
+        btn.textContent = i===0?"★":i===12?"📷":(i+1);
       });
       card.querySelector(".toggle-all").textContent = prog===20?"Desmarcar todas":"Marcar todas";
     }
@@ -213,26 +236,27 @@ function buildContent() {
   const el = document.getElementById("content");
   let html = "";
 
-  const showSpecial = currentFilter==="all"||currentFilter==="incomplete";
   const fwcProg = fwcProgress();
-  if (showSpecial || currentFilter==="all") {
-    html += `<div class="group-label">Figuritas especiales</div>`;
-    const done = fwcProg===FWC.length;
-    html += `<div class="team-card${done?" done":""}" data-team="FWC">
-      <div class="team-header" data-open="FWC">
-        <div class="team-left">✨ Especiales FWC + #00</div>
-        <div class="team-right">
-          <span class="prog-text${done?" full":""}">${fwcProg}/${FWC.length}</span>
-          <span class="chevron${openTeam==="FWC"?" open":""}">▼</span>
+  if (currentFilter==="all" || currentFilter==="incomplete" || (currentFilter==="complete" && fwcProg===FWC.length)) {
+    if (currentFilter!=="complete" || fwcProg===FWC.length) {
+      html += `<div class="group-label">Figuritas especiales</div>`;
+      const done = fwcProg===FWC.length;
+      html += `<div class="team-card${done?" done":""}" data-team="FWC">
+        <div class="team-header" data-open="FWC">
+          <div class="team-left">✨ Especiales FWC + #00</div>
+          <div class="team-right">
+            <span class="prog-text${done?" full":""}">${fwcProg}/${FWC.length}</span>
+            <span class="chevron${openTeam==="FWC"?" open":""}">▼</span>
+          </div>
         </div>
-      </div>
-      <div class="team-body${openTeam==="FWC"?" open":""}">
-        <button class="toggle-all" data-toggleall="FWC">${done?"Desmarcar todas":"Marcar todas"}</button>
-        <div class="fwc-grid">
-          ${FWC.map((label,i)=>`<button class="fwc-btn${owned[`FWC_${i}`]?" on":""}" data-key="FWC_${i}">${owned[`FWC_${i}`]?"✓ ":""}${label}</button>`).join("")}
+        <div class="team-body${openTeam==="FWC"?" open":""}">
+          <button class="toggle-all" data-toggleall="FWC">${done?"Desmarcar todas":"Marcar todas"}</button>
+          <div class="fwc-grid">
+            ${FWC.map((label,i)=>`<button class="fwc-btn${owned[`FWC_${i}`]?" on":""}" data-key="FWC_${i}">${owned[`FWC_${i}`]?"✓ ":""}${label}</button>`).join("")}
+          </div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
+    }
   }
 
   const groups = [...new Set(TEAMS.map(t=>t.g))];
@@ -301,9 +325,18 @@ function buildContent() {
   });
 }
 
+// Escuchar cambios en tiempo real desde Firebase
+onValue(ownedRef, (snapshot) => {
+  owned = snapshot.val() || {};
+  document.getElementById("syncDot").className = "sync-dot ok";
+  updateStats();
+  buildContent();
+}, (error) => {
+  console.error(error);
+  document.getElementById("syncDot").className = "sync-dot err";
+});
+
 buildFilters();
-buildContent();
-updateStats();
 </script>
 </body>
 </html>
