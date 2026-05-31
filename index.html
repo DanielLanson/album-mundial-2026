@@ -7,17 +7,44 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:20px;background:#f5f5f0;color:#1a1a18;min-height:100vh}
+
+/* AUTH MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.hidden{display:none}
+.modal{background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px;text-align:center}
+.modal p{font-size:14px;color:#888;text-align:center;margin-bottom:18px}
+.name-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.name-btn{padding:10px 0;border-radius:10px;border:2px solid #e0ded8;background:#f9f9f7;font-size:16px;font-weight:600;color:#555;cursor:pointer;transition:all .15s;text-align:center}
+.name-btn.selected{border-color:#1D9E75;background:#E1F5EE;color:#0F6E56}
+.pass-input{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e0ded8;font-size:17px;outline:none;margin-bottom:10px;transition:border-color .15s}
+.pass-input:focus{border-color:#1D9E75}
+.pass-input.error{border-color:#e05252;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-btn{width:100%;padding:11px 0;border-radius:10px;border:none;background:#1D9E75;color:#fff;font-size:17px;font-weight:700;cursor:pointer;transition:background .15s}
+.login-btn:active{background:#0F6E56}
+.login-err{font-size:13px;color:#e05252;text-align:center;margin-top:8px;min-height:18px}
+
+/* TOPBAR */
 .topbar{background:#fff;border-bottom:1px solid #e0ded8;padding:12px 16px;position:sticky;top:0;z-index:10}
 .topbar h1{font-size:19px;font-weight:600;margin-bottom:8px}
+.user-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:14px;color:#888}
+.user-bar .who{font-weight:600;color:#0F6E56}
+.user-bar .last{font-size:13px;color:#aaa}
+.user-bar .logout{font-size:13px;color:#aaa;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0}
 .prog-bar{height:8px;border-radius:4px;background:#e0ded8;overflow:hidden}
 .prog-fill{height:100%;border-radius:4px;background:#1D9E75;transition:width .3s}
 .stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .stat{background:#f5f5f0;border-radius:8px;padding:6px 12px;font-size:16px;color:#666;flex:1;min-width:70px;text-align:center}
 .stat b{display:block;font-size:20px;font-weight:600;color:#1a1a18}
+
+/* FILTROS */
 .filters{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;background:#fff;border-bottom:1px solid #e0ded8;overflow-x:auto}
 .filters::-webkit-scrollbar{display:none}
 .fbtn{font-size:16px;padding:5px 12px;border-radius:20px;border:1px solid #ccc;background:#fff;color:#555;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .fbtn.active{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:600}
+
+/* CONTENIDO */
 .content{padding:12px 16px;max-width:600px;margin:0 auto}
 .group-label{font-size:15px;color:#999;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:16px 0 6px}
 .team-card{background:#fff;border:1px solid #e0ded8;border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
@@ -39,10 +66,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .sticker.foil.on{background:#EF9F27;border-color:#EF9F27;color:#fff}
 .sticker.photo{border-color:#B5D4F4;background:#EEF6FE;color:#185FA5}
 .sticker.photo.on{background:#378ADD;border-color:#378ADD;color:#fff}
+.sticker.readonly{cursor:default;opacity:.7}
 .legend{display:flex;gap:12px;margin-top:8px;font-size:15px;color:#aaa}
 .fwc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .fwc-btn{padding:7px 10px;border-radius:8px;border:1px solid #e0ded8;background:#f9f9f7;color:#888;font-size:16px;cursor:pointer;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .fwc-btn.on{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56;font-weight:500}
+.fwc-btn.readonly{cursor:default;opacity:.7}
 .badge-done{display:inline-block;font-size:10px;color:#0F6E56;margin-left:4px}
 .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ccc;margin-left:6px;vertical-align:middle;transition:background .3s}
 .sync-dot.ok{background:#1D9E75}
@@ -53,8 +82,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 </head>
 <body>
 
+<!-- MODAL LOGIN -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>⚽ Album Mundial 2026</h2>
+    <p>Elegí tu nombre e ingresá tu clave</p>
+    <div class="name-btns">
+      <button class="name-btn" data-name="Compu">Compu</button>
+      <button class="name-btn" data-name="Dani">Dani</button>
+      <button class="name-btn" data-name="Milo">Milo</button>
+    </div>
+    <input class="pass-input" id="passInput" type="password" placeholder="Contraseña" autocomplete="off">
+    <button class="login-btn" id="loginBtn">Entrar</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
 <div class="topbar">
-  <h1>⚽ Álbum Panini — Mundial 2026 <span class="sync-dot" id="syncDot" title="Estado de sincronización"></span></h1>
+  <h1>⚽ Álbum Panini — Mundial 2026 <span class="sync-dot" id="syncDot"></span></h1>
+  <div class="user-bar">
+    <span>Hola, <span class="who" id="whoLabel"></span></span>
+    <span class="last" id="lastChangeLabel"></span>
+    <button class="logout" id="logoutBtn">Salir</button>
+  </div>
   <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   <div class="stats">
     <div class="stat"><b id="sPct">0%</b>completado</div>
@@ -85,13 +135,77 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const ownedRef = ref(db, "owned");
+const lastChangeRef = ref(db, "lastChange");
 
+// ── AUTH ─────────────────────────────────────────────────────────────
+const USERS = { "Compu": "M2026-1", "Dani": "M2026-2", "Milo": "M2026-3" };
+const AUTH_KEY = "wc26_user";
+
+let currentUser = localStorage.getItem(AUTH_KEY) || null;
+let selectedName = null;
+
+function isAuth() { return !!currentUser; }
+
+function showModal() {
+  document.getElementById("modalOverlay").classList.remove("hidden");
+}
+function hideModal() {
+  document.getElementById("modalOverlay").classList.add("hidden");
+}
+
+// Nombre selector
+document.querySelectorAll(".name-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".name-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedName = btn.dataset.name;
+    document.getElementById("passInput").focus();
+    document.getElementById("loginErr").textContent = "";
+  });
+});
+
+// Enter en el input
+document.getElementById("passInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("loginBtn").click();
+});
+
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const pass = document.getElementById("passInput").value.trim();
+  const errEl = document.getElementById("loginErr");
+  if (!selectedName) { errEl.textContent = "Elegí tu nombre primero."; return; }
+  if (USERS[selectedName] === pass) {
+    currentUser = selectedName;
+    localStorage.setItem(AUTH_KEY, currentUser);
+    document.getElementById("whoLabel").textContent = currentUser;
+    hideModal();
+    buildContent(); // rebuild to enable interactions
+  } else {
+    errEl.textContent = "Contraseña incorrecta.";
+    const input = document.getElementById("passInput");
+    input.classList.add("error");
+    input.value = "";
+    setTimeout(() => input.classList.remove("error"), 400);
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem(AUTH_KEY);
+  currentUser = null;
+  document.getElementById("passInput").value = "";
+  document.querySelectorAll(".name-btn").forEach(b => b.classList.remove("selected"));
+  selectedName = null;
+  document.getElementById("loginErr").textContent = "";
+  showModal();
+  buildContent();
+});
+
+// ── DATOS ─────────────────────────────────────────────────────────────
 const FWC = [
   "FWC00 — Especial Panini","FWC01 — Trofeo (1/2)","FWC02 — Trofeo (2/2)","FWC03 — Mascota",
-  "FWC04 — Slogan","FWC05 — Pelota","FWC06 — Canadá","FWC07 — México","FWC08 — EE.UU.",
+  "FWC04 — Slogan","FWC05 — Pelota","FWC06 — Canada","FWC07 — Mexico","FWC08 — EE.UU.",
   "FWC9 — Italia 1934","FWC10 — Brasil 1950","FWC11 — Suiza 1954",
-  "FWC12 — Chile 1962","FWC13 — Alemania Occ. 1974","FWC14 — México 1986",
-  "FWC15 — EE.UU. 1994","FWC16 — Corea/Japón 2002","FWC17 — Alemania 2006",
+  "FWC12 — Chile 1962","FWC13 — Alemania Occ. 1974","FWC14 — Mexico 1986",
+  "FWC15 — EE.UU. 1994","FWC16 — Corea/Japon 2002","FWC17 — Alemania 2006",
   "FWC18 — Brasil 2014","FWC19 — Qatar 2022"
 ];
 
@@ -149,30 +263,49 @@ const TEAMS = [
 let owned = {};
 let currentFilter = "all";
 let openTeam = null;
+let lastChange = null;
 
-function save() {
+// ── ÚLTIMO CAMBIO ─────────────────────────────────────────────────────
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return "hace un momento";
+  if (diff < 3600) return `hace ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
+  return `hace ${Math.floor(diff/86400)}d`;
+}
+
+function updateLastChangeLabel() {
+  if (!lastChange) return;
+  document.getElementById("lastChangeLabel").textContent =
+    `Ultimo: ${lastChange.user} · ${timeAgo(lastChange.time)}`;
+}
+
+// ── FIREBASE ──────────────────────────────────────────────────────────
+function save(key) {
   set(ownedRef, owned).catch(() => {
     document.getElementById("syncDot").className = "sync-dot err";
   });
+  if (currentUser && key) {
+    set(lastChangeRef, { user: currentUser, time: Date.now(), sticker: key });
+  }
 }
 
+// ── LÓGICA ────────────────────────────────────────────────────────────
 function toggle(key) {
+  if (!isAuth()) return;
   owned[key] = !owned[key];
   if (!owned[key]) delete owned[key];
-  // optimistic local update
   updateStats();
   updateTeamUI(key.split("_")[0]);
-  save();
+  save(key);
 }
 
 function teamProgress(code) {
   return Array.from({length:20},(_,i)=>owned[`${code}_${i}`]?1:0).reduce((a,b)=>a+b,0);
 }
-
 function fwcProgress() {
   return FWC.filter((_,i)=>owned[`FWC_${i}`]).length;
 }
-
 function totalOwned() {
   let n = fwcProgress();
   TEAMS.forEach(t => { for(let i=0;i<20;i++) if(owned[`${t.c}_${i}`]) n++; });
@@ -199,7 +332,7 @@ function updateTeamUI(code) {
     card.className = "team-card"+(fp===FWC.length?" done":"");
     if (openTeam === "FWC") {
       card.querySelectorAll(".fwc-btn").forEach((btn,i) => {
-        btn.className = "fwc-btn"+(owned[`FWC_${i}`]?" on":"");
+        btn.className = "fwc-btn"+(owned[`FWC_${i}`]?" on":"")+(isAuth()?"":" readonly");
         btn.textContent = (owned[`FWC_${i}`]?"✓ ":"")+FWC[i];
       });
       card.querySelector(".toggle-all").textContent = fp===FWC.length?"Desmarcar todas":"Marcar todas";
@@ -216,7 +349,7 @@ function updateTeamUI(code) {
     if (openTeam === code) {
       card.querySelectorAll(".sticker").forEach((btn,i) => {
         const on = !!owned[`${code}_${i}`];
-        btn.className = "sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
+        btn.className = "sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"")+(isAuth()?"":" readonly");
         btn.textContent = i===0?"★":i===12?"📷":(i+1);
       });
       card.querySelector(".toggle-all").textContent = prog===20?"Desmarcar todas":"Marcar todas";
@@ -238,6 +371,7 @@ function buildFilters() {
 
 function buildContent() {
   const el = document.getElementById("content");
+  const auth = isAuth();
   let html = "";
 
   const fwcProg = fwcProgress();
@@ -254,9 +388,9 @@ function buildContent() {
           </div>
         </div>
         <div class="team-body${openTeam==="FWC"?" open":""}">
-          <button class="toggle-all" data-toggleall="FWC">${done?"Desmarcar todas":"Marcar todas"}</button>
+          ${auth?`<button class="toggle-all" data-toggleall="FWC">${done?"Desmarcar todas":"Marcar todas"}</button>`:""}
           <div class="fwc-grid">
-            ${FWC.map((label,i)=>`<button class="fwc-btn${owned[`FWC_${i}`]?" on":""}" data-key="FWC_${i}">${owned[`FWC_${i}`]?"✓ ":""}${label}</button>`).join("")}
+            ${FWC.map((label,i)=>`<button class="fwc-btn${owned[`FWC_${i}`]?" on":""}${auth?"":" readonly"}" data-key="FWC_${i}">${owned[`FWC_${i}`]?"✓ ":""}${label}</button>`).join("")}
           </div>
         </div>
       </div>`;
@@ -284,13 +418,13 @@ function buildContent() {
           </div>
         </div>
         <div class="team-body${isOpen?" open":""}">
-          <button class="toggle-all" data-toggleall="${team.c}">${prog===20?"Desmarcar todas":"Marcar todas"}</button>
+          ${auth?`<button class="toggle-all" data-toggleall="${team.c}">${prog===20?"Desmarcar todas":"Marcar todas"}</button>`:""}
           <div class="grid">
             ${Array.from({length:20},(_,i)=>{
               const on=!!owned[`${team.c}_${i}`];
-              const cls="sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"");
+              const cls="sticker"+(i===0?" foil":i===12?" photo":"")+(on?" on":"")+(auth?"":" readonly");
               const lbl=i===0?"★":i===12?"📷":(i+1);
-              return `<button class="${cls}" data-key="${team.c}_${i}" title="${i===0?"Escudo FOIL":i===12?"Foto grupal":"Jugador "+(i+1)}">${lbl}</button>`;
+              return `<button class="${cls}" data-key="${team.c}_${i}">${lbl}</button>`;
             }).join("")}
           </div>
           <div class="legend"><span>★ escudo</span><span>📷 foto</span><span>2–20 jugadores</span></div>
@@ -301,9 +435,25 @@ function buildContent() {
 
   el.innerHTML = html;
 
-  el.querySelectorAll("[data-key]").forEach(btn => {
-    btn.addEventListener("click", ()=>{ toggle(btn.dataset.key); });
-  });
+  if (auth) {
+    el.querySelectorAll("[data-key]").forEach(btn => {
+      btn.addEventListener("click", ()=>{ toggle(btn.dataset.key); });
+    });
+    el.querySelectorAll("[data-toggleall]").forEach(btn => {
+      btn.addEventListener("click", e=>{
+        e.stopPropagation();
+        const code = btn.dataset.toggleall;
+        if (code==="FWC") {
+          const all = FWC.every((_,i)=>owned[`FWC_${i}`]);
+          FWC.forEach((_,i)=>{ owned[`FWC_${i}`]=!all; if(!owned[`FWC_${i}`]) delete owned[`FWC_${i}`]; });
+        } else {
+          const all = teamProgress(code)===20;
+          for(let i=0;i<20;i++){ owned[`${code}_${i}`]=!all; if(!owned[`${code}_${i}`]) delete owned[`${code}_${i}`]; }
+        }
+        save(null); updateStats(); buildContent();
+      });
+    });
+  }
 
   el.querySelectorAll("[data-open]").forEach(hdr => {
     hdr.addEventListener("click", ()=>{
@@ -312,23 +462,9 @@ function buildContent() {
       buildContent();
     });
   });
-
-  el.querySelectorAll("[data-toggleall]").forEach(btn => {
-    btn.addEventListener("click", e=>{
-      e.stopPropagation();
-      const code = btn.dataset.toggleall;
-      if (code==="FWC") {
-        const all = FWC.every((_,i)=>owned[`FWC_${i}`]);
-        FWC.forEach((_,i)=>{ owned[`FWC_${i}`]=!all; if(!owned[`FWC_${i}`]) delete owned[`FWC_${i}`]; });
-      } else {
-        const all = teamProgress(code)===20;
-        for(let i=0;i<20;i++){ owned[`${code}_${i}`]=!all; if(!owned[`${code}_${i}`]) delete owned[`${code}_${i}`]; }
-      }
-      save(); updateStats(); buildContent();
-    });
-  });
 }
 
+// ── EXPORT ────────────────────────────────────────────────────────────
 function ascii(str) {
   return str.normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
@@ -340,7 +476,6 @@ function exportMissing() {
   lines.push(`${980 - totalOwned()} de 980`);
   lines.push("");
 
-  // FWC
   const fwcMissing = FWC.map((label, i) => owned[`FWC_${i}`] ? null : label).filter(Boolean);
   if (fwcMissing.length) {
     lines.push("FWC");
@@ -348,20 +483,15 @@ function exportMissing() {
     lines.push("");
   }
 
-  // Equipos por grupo
   const groups = [...new Set(TEAMS.map(t => t.g))];
   groups.forEach(group => {
     const teamLines = [];
     TEAMS.filter(t => t.g === group).forEach(team => {
       const missing = [];
       for (let i = 0; i < 20; i++) {
-        if (!owned[`${team.c}_${i}`]) {
-          missing.push(String(i + 1).padStart(2, "0"));
-        }
+        if (!owned[`${team.c}_${i}`]) missing.push(String(i+1).padStart(2,"0"));
       }
-      if (missing.length) {
-        teamLines.push(`  ${ascii(team.n)}: ${missing.join(", ")}`);
-      }
+      if (missing.length) teamLines.push(`  ${ascii(team.n)}: ${missing.join(", ")}`);
     });
     if (teamLines.length) {
       lines.push(ascii(group));
@@ -370,9 +500,7 @@ function exportMissing() {
     }
   });
 
-  if (lines.length <= 3) {
-    lines.push("Album completo!");
-  }
+  if (lines.length <= 3) lines.push("Album completo!");
 
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -385,7 +513,22 @@ function exportMissing() {
 
 document.getElementById("exportBtn").addEventListener("click", exportMissing);
 
-// Escuchar cambios en tiempo real desde Firebase
+// ── INIT ──────────────────────────────────────────────────────────────
+if (currentUser) {
+  document.getElementById("whoLabel").textContent = currentUser;
+  hideModal();
+} else {
+  showModal();
+}
+
+// Actualizar label de ultimo cambio cada minuto
+setInterval(updateLastChangeLabel, 60000);
+
+onValue(lastChangeRef, snapshot => {
+  lastChange = snapshot.val();
+  updateLastChangeLabel();
+});
+
 onValue(ownedRef, (snapshot) => {
   owned = snapshot.val() || {};
   document.getElementById("syncDot").className = "sync-dot ok";
